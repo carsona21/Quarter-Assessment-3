@@ -1,3 +1,9 @@
+# Insert this at the top of your GUI.py file, near other imports and class definitions
+import tkinter as tk
+from tkinter import messagebox
+import sqlite3
+
+# Question class for modular question handling
 class Question:
     def __init__(self, question_text, options, correct_option_index):
         self.question_text = question_text
@@ -12,10 +18,8 @@ class Question:
         """Return the correct answer text."""
         return self.options[self.correct_option_index - 1]  # Adjust for 0-based indexing
 
-import tkinter as tk
-from tkinter import messagebox
-import sqlite3
 
+# QuizWindow class to handle quiz logic
 class QuizWindow:
     def __init__(self, parent, selected_topic):
         self.root = parent
@@ -91,3 +95,38 @@ class QuizWindow:
             widget.destroy()
         tk.Label(self.root, text=f"Quiz Completed! Your score: {self.score}/{len(self.questions)}").pack(pady=20)
         tk.Button(self.root, text="Exit", command=self.root.destroy).pack(pady=20)
+
+
+# Main QuizBowlApp class to select topics and start the quiz
+class QuizBowlApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Quiz Bowl")
+        self.create_main_menu()
+
+    def create_main_menu(self):
+        tk.Label(self.root, text="Welcome to the Quiz Bowl!").pack(pady=10)
+        tk.Label(self.root, text="Select a topic to begin:").pack(pady=5)
+
+        # Example topics - replace with your database table names
+        topics = ["ACCT2110", "BMGT3500", "ECON4900", "MKT3400", "FIN3210"]
+        self.selected_topic = tk.StringVar(value=topics[0])
+
+        for topic in topics:
+            tk.Radiobutton(self.root, text=topic, variable=self.selected_topic, value=topic).pack(anchor=tk.W)
+
+        tk.Button(self.root, text="Start Quiz", command=self.start_quiz).pack(pady=20)
+
+    def start_quiz(self):
+        selected_topic = self.selected_topic.get()
+        if selected_topic:
+            quiz_window = tk.Toplevel(self.root)
+            QuizWindow(quiz_window, selected_topic)
+        else:
+            messagebox.showwarning("Selection Error", "Please select a topic to start the quiz.")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = QuizBowlApp(root)
+    root.mainloop()
